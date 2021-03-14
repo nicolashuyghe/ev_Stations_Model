@@ -5,9 +5,10 @@ from ev_Stations_Model.data import clean_data
 from ev_Stations_Model.encoders import label_encoder
 from ev_Stations_Model.utils import unpivot
 from ev_Stations_Model.features import timeFeatures, combine_event_feat
+from ev_Stations_Model.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION
 
 
-TEST_PATH = "raw_data/ytrain_raw.csv"
+TEST_PATH = "raw_data/ytest_isna.csv"
 PATH_TO_LOCAL_MODEL = "model.joblib"
 PRED_PATH = "data/ypred.csv"
 
@@ -19,7 +20,6 @@ def predict(df, model, target_col, idx_cols, integer_output=True):
         target_col (str): Name of the target column
         idx_col (list[str]): List of the names of the index columns, e.g. ["store", "brand", "week"]
         integer_output (bool): It it is True, the forecast will be rounded to an integer
-
     Returns:
         pandas.DataFrame including the predictions of the target variable
     """
@@ -42,6 +42,15 @@ def get_test_data(nrows=None):
 def get_model(path_to_joblib):
     pipeline = joblib.load(path_to_joblib)
     return pipeline
+
+
+def download_model_from_gcp():
+    client = storage.Client().bucket(bucket)
+    storage_location = f"models/{MODEL_NAME}/{MODEL_VERSION}/model.joblib"
+    blob = client.blob(storage_location)
+    blob.download_to_filename('model.joblib')
+    print("=> pipeline downloaded from storage")
+    model = joblib.load('model.joblib')
 
 
 def generate_csv(path, df_pred):

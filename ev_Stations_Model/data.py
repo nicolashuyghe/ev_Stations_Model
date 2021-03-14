@@ -3,12 +3,12 @@
 
 import pandas as pd
 from ev_Stations_Model.utils import simple_time_tracker
-# from google.cloud import storage
+from google.cloud import storage
 
 TRAIN_PATH = "raw_data/ytrain_raw.csv"
-GS_PATH = "" # adresse gs à MAJ
+GS_PATH = "gs://ev-stations-bucket-202103/raw_data/ytrain_raw.csv"
 
-'''
+
 @simple_time_tracker
 def get_data_from_gcp(nrows=10000, local=False, **kwargs):
     """method to get the training data (or a portion of it) from google cloud bucket"""
@@ -19,7 +19,7 @@ def get_data_from_gcp(nrows=10000, local=False, **kwargs):
     else:
         path = GS_PATH
     df = pd.read_csv(path, nrows=nrows)
-    return df'''
+    return df
 
 
 def get_train_data(nrows=None):

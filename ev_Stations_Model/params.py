@@ -8,12 +8,12 @@
 
 ### GCP Storage - - - - - - - - - - - - - - - - - - - - - -
 
-BUCKET_NAME = 'wagon-ev-scharging-stations'
+BUCKET_NAME = 'ev-stations-bucket-202103'
 
 ##### Data  - - - - - - - - - - - - - - - - - - - - - - - -
 
 # train data file location
-BUCKET_TRAIN_DATA_PATH = 'data/y_train_raw.csv'
+BUCKET_TRAIN_DATA_PATH = 'raw_data/ytrain_raw.csv'
 
 ##### Training  - - - - - - - - - - - - - - - - - - - - - -
 
@@ -22,10 +22,10 @@ BUCKET_TRAIN_DATA_PATH = 'data/y_train_raw.csv'
 ##### Model - - - - - - - - - - - - - - - - - - - - - - - -
 
 # model folder name (will contain the folders for all trained model versions)
-MODEL_NAME = 'models'
+MODEL_NAME = 'LightGbm'
 
 # model version folder name (where the trained model.joblib file will be stored)
-MODEL_VERSION = 'LightGbm'
+MODEL_VERSION = 'v0'
 
 ### GCP AI Platform - - - - - - - - - - - - - - - - - - - -
 
