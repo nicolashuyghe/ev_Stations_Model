@@ -32,7 +32,11 @@ async def startup_event():
     model_path = os.path.join(dirname, 'model.joblib')
     model = joblib.load(model_path)
     cache_models["model_lgbm"] = model
-    print("model is ready ...")
+    print("model #1 is ready ...")
+    model_path_2 = os.path.join(dirname, 'model_2.joblib')
+    model_2 = joblib.load(model_path_2)
+    cache_models["model_lgbm_2"] = model_2
+    print("model #2 is ready ...")
 
 
 # ---------------------------------------------------------------------------
@@ -68,6 +72,49 @@ def get_handler(request: Request, response: Response, station_id, year, month, d
 
     response_payload = {
         's_id': int(station_id),
+        'year': int(year),
+        'month': int(month),
+        'day': int(day),
+        'hour': int(hour),
+        'minute': int(minute),
+        "number_terminals_available": int(y_pred)
+    }
+
+    return response_payload
+
+@app.get("/predict-type")
+def get_handler(request: Request, response: Response, station_id, terminal_type, year, month, day, hour, minute):
+
+    terminal_type_dict = {'normal':0,'fast':1}
+
+    params = {
+        's_id': int(station_id),
+        't_type': terminal_type_dict[terminal_type],
+        'year': int(year),
+        'month': int(month),
+        'day': int(day),
+        'hour': int(hour),
+        'minute': int(minute)
+    }
+
+    # Parse parameters into a dataframe
+    df_pred_fea = pd.DataFrame.from_dict([params])
+
+    # Add columns timestamp and weekdat to compute event features
+    df_pred_fea['timestamp'] = pd.to_datetime(df_pred_fea[['year', 'month', 'day', 'hour', 'minute']])
+    df_pred_fea['weekday'] = pd.to_datetime(df_pred_fea['timestamp']).dt.weekday
+
+    # Add event features
+    df_pred_fea_augmented = combine_event_feat(df_pred_fea)
+
+    # Compute prediction
+    idx_cols = ['s_id', 't_type', 'year', 'month', 'day', 'hour', 'minute']
+    y_pred = predict(df_pred_fea_augmented, model=cache_models["model_lgbm_2"], target_col="value", idx_cols=idx_cols, integer_output=True)
+    y_pred = y_pred['value'][0]
+
+    response_payload = {
+        's_id': int(station_id),
+        't_type': terminal_type,
         'year': int(year),
         'month': int(month),
         'day': int(day),
